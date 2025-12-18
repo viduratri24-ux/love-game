@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gift for You</title>
+<style>
+    body {
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(to top, #ffe6f0, #ffcccc);
+        overflow: hidden;
+        text-align: center;
+    }
+    #gameArea {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
+    .balloon, .key {
+        position: absolute;
+        width: 60px;
+        height: 80px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 30px;
+        user-select: none;
+        transition: transform 0.2s;
+    }
+    .balloon:hover, .key:hover {
+        transform: scale(1.2);
+    }
+    .sparkle {
+        position: absolute;
+        font-size: 20px;
+        pointer-events: none;
+        animation: sparkleAnim 0.8s forwards;
+    }
+    @keyframes sparkleAnim {
+        0% {opacity: 1; transform: scale(1) translateY(0);}
+        100% {opacity: 0; transform: scale(2) translateY(-50px);}
+    }
+    #box {
+        display: none;
+        position: absolute;
+        bottom: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 150px;
+        height: 150px;
+        background: #ff3399;
+        border-radius: 20px;
+        cursor: pointer;
+        box-shadow: 0 0 20px rgba(255,0,102,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 50px;
+        color: white;
+    }
+    #message {
+        display: none;
+        position: absolute;
+        top: 30%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        color: #ff0066;
+        font-size: 20px;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(255,0,102,0.5);
+    }
+</style>
+</head>
+<body>
+<div id="gameArea"></div>
+<div id="box">🎁</div>
+<div id="message">
+    my beloved every moment with you is a treasure you are my sunshine my flowers my world i love you endlessly and forever i will always cherish protect and adore you you are my heart my everything
+</div>
+
+<script>
+// Game settings
+const gameArea = document.getElementById('gameArea');
+const box = document.getElementById('box');
+const message = document.getElementById('message');
+
+let balloonsPopped = 0;
+const totalBalloons = 10;
+const colors = ['red','pink','purple','orange','yellow','blue','magenta'];
+
+// Pop sound
+const popSound = new Audio('https://www.soundjay.com/button/sounds/button-16.mp3');
+
+// Stage 1: Balloons
+function createBalloon(){
+    const balloon = document.createElement('div');
+    balloon.classList.add('balloon');
+    balloon.style.background = colors[Math.floor(Math.random()*colors.length)];
+    balloon.style.left = Math.random() * (window.innerWidth - 60) + 'px';
+    balloon.style.top = window.innerHeight + Math.random() * 300 + 'px';
+    balloon.innerText = '🎈';
+    gameArea.appendChild(balloon);
+
+    // float animation
+    const speed = 1 + Math.random() * 2;
+    const moveInterval = setInterval(()=>{
+        let top = parseFloat(balloon.style.top);
+        if(top < -100){
+            balloon.style.top = window.innerHeight + 'px';
+        } else {
+            balloon.style.top = top - speed + 'px';
+        }
+    },20);
+
+    // pop
+    balloon.addEventListener('click', ()=>{
+        const sparkle = document.createElement('div');
+        sparkle.classList.add('sparkle');
+        sparkle.style.left = balloon.offsetLeft + 'px';
+        sparkle.style.top = balloon.offsetTop + 'px';
+        sparkle.innerText = '💖';
+        gameArea.appendChild(sparkle);
+        setTimeout(()=>sparkle.remove(),800);
+
+        popSound.currentTime = 0;
+        popSound.play();
+
+        balloon.remove();
+        clearInterval(moveInterval);
+        balloonsPopped++;
+        if(balloonsPopped >= totalBalloons){
+            startStage2();
+        }
+    });
+}
+
+// Generate balloons
+for(let i=0;i<totalBalloons;i++){
+    createBalloon();
+}
+
+// Stage 2: Collect Keys
+let keysCollected = 0;
+const totalKeys = 5;
+
+function startStage2(){
+    alert("Great job! Now collect the keys to unlock your gift 🎉");
+    for(let i=0;i<totalKeys;i++){
+        const key = document.createElement('div');
+        key.classList.add('key');
+        key.style.background = colors[Math.floor(Math.random()*colors.length)];
+        key.style.left = Math.random() * (window.innerWidth - 60) + 'px';
+        key.style.top = Math.random() * (window.innerHeight/2) + 'px';
+        key.innerText = '🔑';
+        gameArea.appendChild(key);
+
+        // float
+        const speed = 0.5 + Math.random();
+        const moveInterval = setInterval(()=>{
+            let top = parseFloat(key.style.top);
+            key.style.top = top + speed + 'px';
+            if(top > window.innerHeight - 80){
+                key.style.top = '0px';
+            }
+        },30);
+
+        key.addEventListener('click', ()=>{
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            sparkle.style.left = key.offsetLeft + 'px';
+            sparkle.style.top = key.offsetTop + 'px';
+            sparkle.innerText = '💖';
+            gameArea.appendChild(sparkle);
+            setTimeout(()=>sparkle.remove(),800);
+
+            popSound.currentTime = 0;
+            popSound.play();
+
+            key.remove();
+            clearInterval(moveInterval);
+            keysCollected++;
+            if(keysCollected >= totalKeys){
+                showGiftBox();
+            }
+        });
+    }
+}
+
+// Stage 3: Show Gift Box
+function showGiftBox(){
+    alert("You collected all keys! Click the gift to see your surprise 🎁");
+    box.style.display = 'flex';
+}
+
+box.addEventListener('click', ()=>{
+    box.style.display = 'none';
+    message.style.display = 'block';
+});
+</script>
+</body>
+</html>
